@@ -13,9 +13,9 @@
         }
 
         :root {
-            --primary: #e74c3c;
-            --primary-dark: #c0392b;
-            --primary-light: #f5a89f;
+            --primary: #D4AF37;
+            --primary-dark: #B8860B;
+            --primary-light: #F5DEB3;
             --accent: #fff;
             --bg-dark: #1a1a1a;
             --bg-light: #f8f9fa;
@@ -45,7 +45,7 @@
 
         /* HEADER */
         .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
             color: white;
             padding: 25px;
             border-radius: 12px;
@@ -95,6 +95,86 @@
             margin-bottom: 20px;
             color: var(--text-dark);
             font-size: 22px;
+        }
+
+        .restaurant-intro {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%), 
+                        url('https://www.kudaveceras.rs/images/kcfinder/image/Blog/restoran-tri-%C5%A1e%C5%A1ira-01.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            padding: 60px 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .restaurant-intro h2 {
+            font-size: 52px;
+            margin-bottom: 15px;
+            font-weight: 800;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.8);
+            color: #FFD700;
+            letter-spacing: 2px;
+            font-family: 'Georgia', 'Garamond', serif;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8));
+        }
+
+        .restaurant-tagline {
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-style: italic;
+            opacity: 1;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+            color: #FFE4B5;
+            font-family: 'Georgia', 'Garamond', serif;
+            font-weight: 600;
+        }
+
+        .restaurant-description {
+            font-size: 16px;
+            line-height: 1.9;
+            margin-bottom: 25px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 1;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+            color: #F5F5DC;
+            font-family: 'Georgia', serif;
+            font-weight: 500;
+        }
+
+        .restaurant-address {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px 30px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 20px;
+            border-left: 5px solid #FFD700;
+            backdrop-filter: blur(5px);
+        }
+
+        .restaurant-address p {
+            margin: 8px 0;
+            font-size: 15px;
+            opacity: 1;
+            color: #F5F5DC;
+            font-weight: 500;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+        }
+
+        .address-label {
+            font-weight: 800;
+            color: #FFD700;
+            margin-right: 8px;
         }
 
         #qrVideo {
@@ -734,26 +814,48 @@
 
         <!-- HEADER -->
         <div class="header">
-            <h1>🍽️ Restoranski Meni</h1>
-            <p>Dobrodošli! Skenujte QR kod sa vašeg stola</p>
+            <h1>🎩 Restoran Tri Šešira</h1>
+            <p>Dobrodosli! Odaberite broj stola i narucite</p>
             <div class="table-info" id="tableInfo" style="display: none;">
                 Sto broj: <span id="tableNumber">-</span>
-            </div>
-            <div style="margin-top: 15px;">
-                <button class="btn btn-secondary" onclick="openAdminPanel()" style="font-size: 12px; padding: 8px 16px;">⚙️ Admin Panel</button>
-                <button class="btn btn-secondary" onclick="openQRGenerator()" style="font-size: 12px; padding: 8px 16px; margin-left: 10px;">📱 QR Kodovi</button>
             </div>
         </div>
 
         <!-- SCANNER -->
         <div class="scanner-section active" id="scannerSection">
-            <h2>Skeniranje QR Koda</h2>
-            <video id="qrVideo" autoplay style="display: none;"></video>
-            <div class="scanner-buttons">
-                <button class="btn btn-primary" id="startCameraBtn">📷 Uključi Kameru</button>
-                <button class="btn btn-secondary" id="manualInputBtn">📝 Unos Broja Stola</button>
+            <!-- RESTORAN INTRO -->
+            <div class="restaurant-intro">
+                <h2>🎩 Restoran Tri Šešira</h2>
+                <div class="restaurant-tagline">
+                    "Tradicija, ukus i gostoljublje od 1985. godine"
+                </div>
+                <div class="restaurant-description">
+                    Dobrodosli u Restoran Tri Sesira - legendu beogradske gastronomije! 
+                    Vise od tri decenije, ove kuce uziavamo tradicionalnim srpskim jelima pripremljenim 
+                    sa ljubavlju i najfinijim lokalnim proizvodima. Nasa kuhinja je simbol autenticenosti, 
+                    a svaki odsek ispod stola je posebna bajka ukusa. Od rostilj specijaliteta do domacih 
+                    delikatesa, svi jela su rezultat duge tradicije i strasti naseg sefa kuhinje.
+                </div>
+                <div class="restaurant-address">
+                    <p><span class="address-label">📍 Lokacija:</span> Kneza Miloša 45, Beograd</p>
+                    <p><span class="address-label">📞 Telefon:</span> +381 11 123 4567</p>
+                    <p><span class="address-label">⏰ Radno vrijeme:</span> 12:00 - 23:00</p>
+                </div>
             </div>
-            <div id="scannerMessage" style="margin-top: 20px; color: #7f8c8d;"></div>
+
+            <!-- DUGME ZA UNOS BROJA STOLA -->
+            <div style="margin-top: 30px;">
+                <p style="font-size: 16px; font-weight: 600; color: var(--text-dark); margin-bottom: 15px;">
+                    Odaberite broj stola ili skenujte QR kod sa stola
+                </p>
+                <button class="btn btn-primary" id="manualInputBtn" style="font-size: 16px; padding: 15px 30px;">
+                    📝 Unesi Broj Stola
+                </button>
+            </div>
+
+            <div id="scannerMessage" style="margin-top: 20px; color: #7f8c8d;">
+                <p style="font-size: 14px;">ili skenujte QR kod sa vaseg stola pomoc kamere na telefonu</p>
+            </div>
         </div>
 
         <!-- MENU -->
@@ -762,12 +864,17 @@
             
             <div class="loader" id="loader">
                 <div class="spinner"></div>
-                <p>Učitavanje menija...</p>
+                <p>Ucitavanje menija...</p>
             </div>
             
             <div class="filters" id="filterContainer"></div>
             
             <div class="menu-grid" id="menuGrid"></div>
+        </div>
+
+        <!-- ADMIN PANEL DUGME NA DNU -->
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid var(--border);">
+            <button class="btn btn-secondary" onclick="openAdminPanel()" style="font-size: 14px; padding: 12px 30px;">⚙️ Admin Panel</button>
         </div>
     </div>
 
@@ -807,19 +914,6 @@
         </div>
     </div>
 
-    <!-- QR KOD GENERATOR MODAL -->
-    <div class="modal" id="qrModal">
-        <div class="modal-content">
-            <h2>📱 QR Kod za Meni</h2>
-            <p>Skenujte ovaj QR kod sa mobilnog telefona</p>
-            <div id="qrSelectorButtons" class="qr-buttons"></div>
-            <div id="qrCodeDisplay" class="qr-container"></div>
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="btn btn-secondary" onclick="closeModal('qrModal')">Zatvori</button>
-            </div>
-        </div>
-    </div>
-
     <!-- ADMIN PANEL MODAL -->
     <div class="modal" id="adminModal">
         <div class="modal-content admin-panel-modal">
@@ -854,7 +948,6 @@
         const scannerSection = document.getElementById('scannerSection');
         const menuSection = document.getElementById('menuSection');
         const qrVideo = document.getElementById('qrVideo');
-        const startCameraBtn = document.getElementById('startCameraBtn');
         const manualInputBtn = document.getElementById('manualInputBtn');
         const tableModal = document.getElementById('tableModal');
         const tableInput = document.getElementById('tableInput');
@@ -875,7 +968,6 @@
         const loader = document.getElementById('loader');
 
         // EVENT LISTENERS
-        startCameraBtn.addEventListener('click', startCamera);
         manualInputBtn.addEventListener('click', openTableModal);
         tableConfirmBtn.addEventListener('click', confirmTableNumber);
         tableCancelBtn.addEventListener('click', closeTableModal);
@@ -896,47 +988,7 @@
             }
         });
 
-        // FUNCTIONS
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' }
-                });
-                qrVideo.srcObject = stream;
-                qrVideo.style.display = 'block';
-                startCameraBtn.disabled = true;
-                scanQRCode();
-            } catch (error) {
-                showMessage('Greška pri otvaranju kamere', 'error');
-            }
-        }
-
-        function scanQRCode() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-
-            function scan() {
-                if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA) {
-                    canvas.width = qrVideo.videoWidth;
-                    canvas.height = qrVideo.videoHeight;
-                    ctx.drawImage(qrVideo, 0, 0);
-
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-                    if (code) {
-                        const qrData = code.data;
-                        if (!isNaN(qrData)) {
-                            setTableNumber(qrData);
-                            qrVideo.srcObject.getTracks().forEach(track => track.stop());
-                            return;
-                        }
-                    }
-                }
-                requestAnimationFrame(scan);
-            }
-            scan();
-        }
+        // FUNKCIJE ZA UNOS BROJA STOLA
 
         function openTableModal() {
             tableModal.classList.add('active');
@@ -1182,36 +1234,6 @@
             messageContainer.innerHTML = `<div class="${className}">${message}</div>`;
         }
 
-        // QR KOD GENERATOR - JEDNOSTAVAN
-        function openQRGenerator() {
-            const qrModal = document.getElementById('qrModal');
-            
-            // Koristite pravi GitHub Pages URL
-            const qrUrl = 'https://slobodanai00-cyber.github.io/restaurant-qr-menu-DEMO.html/';
-            
-            console.log('QR URL:', qrUrl);
-            
-            // Koristi QR kod API sa URL-om
-            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrUrl)}`;
-            
-            const qrCodeDisplay = document.getElementById('qrCodeDisplay');
-            qrCodeDisplay.innerHTML = `
-                <h3 style="margin: 20px 0;">📱 Skenujte ovaj QR kod sa mobilnog telefona</h3>
-                <div class="qr-code">
-                    <img src="${qrApiUrl}" alt="QR kod za meni" style="width: 300px; height: 300px;">
-                </div>
-                <p style="font-size: 14px; color: #7f8c8d; margin-top: 20px; word-break: break-all;">URL: <strong>${qrUrl}</strong></p>
-                <p style="font-size: 13px; color: #27ae60; margin-top: 10px;">✅ Skenujte QR kod sa mobilnog - meni će se učitati</p>
-            `;
-            
-            // Očisti selector buttons
-            document.getElementById('qrSelectorButtons').innerHTML = '';
-            
-            qrModal.classList.add('active');
-        }
-
-        // Nema potrebe za generateQRCode jer koristimo samo jedan QR kod
-
         // ADMIN PANEL
         function openAdminPanel() {
             document.getElementById('adminModal').classList.add('active');
@@ -1284,7 +1306,6 @@
         window.addToCart = addToCart;
         window.removeFromCart = removeFromCart;
         window.updateQuantity = updateQuantity;
-        window.openQRGenerator = openQRGenerator;
         window.openAdminPanel = openAdminPanel;
         window.closeModal = closeModal;
         window.clearAllOrders = clearAllOrders;
