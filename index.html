@@ -1186,12 +1186,12 @@
         function openQRGenerator() {
             const qrModal = document.getElementById('qrModal');
             
-            // Uzmi trenutni URL iz browser-a
-            let qrUrl = window.location.href.split('?')[0];
+            // Koristite pravi GitHub Pages URL
+            const qrUrl = 'https://slobodanai00-cyber.github.io/restaurant-qr-menu-DEMO.html/';
             
             console.log('QR URL:', qrUrl);
             
-            // Koristi QR kod API sa trenutnim URL-om
+            // Koristi QR kod API sa URL-om
             const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrUrl)}`;
             
             const qrCodeDisplay = document.getElementById('qrCodeDisplay');
@@ -1201,7 +1201,7 @@
                     <img src="${qrApiUrl}" alt="QR kod za meni" style="width: 300px; height: 300px;">
                 </div>
                 <p style="font-size: 14px; color: #7f8c8d; margin-top: 20px; word-break: break-all;">URL: <strong>${qrUrl}</strong></p>
-                <p style="font-size: 13px; color: #27ae60; margin-top: 10px;">✅ Skenujte QR kod - trebalo bi da vodi na ovaj URL</p>
+                <p style="font-size: 13px; color: #27ae60; margin-top: 10px;">✅ Skenujte QR kod sa mobilnog - meni će se učitati</p>
             `;
             
             // Očisti selector buttons
