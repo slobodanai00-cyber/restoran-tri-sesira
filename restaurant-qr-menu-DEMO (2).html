@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restorani Meni - QR Narudžbina (DEMO)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #e74c3c;
+            --primary-dark: #c0392b;
+            --primary-light: #f5a89f;
+            --accent: #fff;
+            --bg-dark: #1a1a1a;
+            --bg-light: #f8f9fa;
+            --text-dark: #2c3e50;
+            --text-light: #ecf0f1;
+            --border: #e0e0e0;
+            --success: #27ae60;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .table-info {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-top: 12px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* QR SCANNER */
+        .scanner-section {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .scanner-section.active {
+            display: block;
+        }
+
+        .scanner-section h2 {
+            margin-bottom: 20px;
+            color: var(--text-dark);
+            font-size: 22px;
+        }
+
+        #qrVideo {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 3px solid var(--primary);
+        }
+
+        .scanner-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-dark);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            border-color: var(--primary);
+        }
+
+        /* MENU SECTION */
+        .menu-section {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .menu-section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            color: var(--text-dark);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .item-header {
+            padding: 16px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #fff 100%);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .item-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .item-category {
+            display: inline-block;
+            background: var(--primary-light);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .item-content {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-description {
+            color: #7f8c8d;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            flex: 1;
+        }
+
+        .item-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-add {
+            flex: 1;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-add:hover {
+            background: var(--primary-dark);
+            transform: scale(1.02);
+        }
+
+        /* CART */
+        .cart-panel {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            border-radius: 12px 0 0 12px;
+        }
+
+        .cart-panel.open {
+            transform: translateX(0);
+        }
+
+        .cart-header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-close {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .cart-close:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .cart-item {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .cart-item-price {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border-radius: 6px;
+            padding: 4px 8px;
+        }
+
+        .qty-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:hover {
+            background: var(--primary-light);
+            border-radius: 4px;
+        }
+
+        .cart-remove {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .cart-remove:hover {
+            background: #c0392b;
+        }
+
+        .cart-footer {
+            padding: 20px;
+            border-top: 2px solid var(--border);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .cart-total-label {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .cart-total-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .cart-empty {
+            text-align: center;
+            color: #95a5a6;
+            padding: 40px 20px;
+            font-size: 14px;
+        }
+
+        .btn-checkout {
+            width: 100%;
+            padding: 15px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-checkout:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+
+        .btn-checkout:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* CART BUTTON */
+        .cart-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .cart-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #27ae60;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .modal-content p {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .qr-code {
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .qr-code img {
+            width: 250px;
+            height: 250px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+        }
+
+        .qr-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .admin-panel-modal {
+            max-width: 900px !important;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .orders-list {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: left;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .order-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .order-header {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .order-details {
+            font-size: 14px;
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+
+        .order-total {
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .demo-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f39c12;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-panel {
+                max-width: 100%;
+            }
+
+            .cart-toggle {
+                bottom: 20px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+            }
+        }
+
+        .error-message {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .info-message {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .success-message {
+            background: #27ae60;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .loader {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid var(--bg-light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="demo-badge">🚀 DEMO VERZIJA</div>
+
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🍽️ Restoranski Meni</h1>
+            <p>Dobrodošli! Skenujte QR kod sa vašeg stola</p>
+            <div class="table-info" id="tableInfo" style="display: none;">
+                Sto broj: <span id="tableNumber">-</span>
+            </div>
+            <div style="margin-top: 15px;">
+                <button class="btn btn-secondary" onclick="openAdminPanel()" style="font-size: 12px; padding: 8px 16px;">⚙️ Admin Panel</button>
+                <button class="btn btn-secondary" onclick="openQRGenerator()" style="font-size: 12px; padding: 8px 16px; margin-left: 10px;">📱 QR Kodovi</button>
+            </div>
+        </div>
+
+        <!-- SCANNER -->
+        <div class="scanner-section active" id="scannerSection">
+            <h2>Skeniranje QR Koda</h2>
+            <video id="qrVideo" autoplay style="display: none;"></video>
+            <div class="scanner-buttons">
+                <button class="btn btn-primary" id="startCameraBtn">📷 Uključi Kameru</button>
+                <button class="btn btn-secondary" id="manualInputBtn">📝 Unos Broja Stola</button>
+            </div>
+            <div id="scannerMessage" style="margin-top: 20px; color: #7f8c8d;"></div>
+        </div>
+
+        <!-- MENU -->
+        <div class="menu-section" id="menuSection">
+            <div id="messageContainer"></div>
+            
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p>Učitavanje menija...</p>
+            </div>
+            
+            <div class="filters" id="filterContainer"></div>
+            
+            <div class="menu-grid" id="menuGrid"></div>
+        </div>
+    </div>
+
+    <!-- CART BUTTON -->
+    <button class="cart-toggle" id="cartToggle">
+        🛒
+        <span class="cart-count" id="cartCount" style="display: none;">0</span>
+    </button>
+
+    <!-- CART PANEL -->
+    <div class="cart-panel" id="cartPanel">
+        <div class="cart-header">
+            Narudžbina
+            <button class="cart-close" id="cartClose">✕</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <div class="cart-empty">Korpa je prazna</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span class="cart-total-label">Ukupno:</span>
+                <span class="cart-total-amount" id="cartTotalAmount">0 RSD</span>
+            </div>
+            <button class="btn-checkout" id="checkoutBtn" disabled>Završi Narudžbinu</button>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal" id="tableModal">
+        <div class="modal-content">
+            <h2>Unesite broj stola</h2>
+            <input type="number" id="tableInput" placeholder="Npr. 5" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; margin-bottom: 20px;">
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="tableConfirmBtn">Potvrdi</button>
+                <button class="btn btn-secondary" id="tableCancelBtn">Otkaži</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR KOD GENERATOR MODAL -->
+    <div class="modal" id="qrModal">
+        <div class="modal-content">
+            <h2>📱 QR Kod za Meni</h2>
+            <p>Skenujte ovaj QR kod sa mobilnog telefona</p>
+            <div id="qrSelectorButtons" class="qr-buttons"></div>
+            <div id="qrCodeDisplay" class="qr-container"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeModal('qrModal')">Zatvori</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL MODAL -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content admin-panel-modal">
+            <h2>⚙️ Admin Panel - Narudžbine</h2>
+            <p>Pregled svih narudžbina sa stolova</p>
+            <div style="margin: 20px 0;">
+                <button class="btn btn-secondary" onclick="clearAllOrders()" style="background: #e74c3c; color: white;">🗑️ Očisti sve narudžbine</button>
+            </div>
+            <div id="ordersListContainer" class="orders-list">
+                <p style="text-align: center; color: #95a5a6;">Nema narudžbina</p>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeModal('adminModal')">Zatvori</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Google Apps Script Proxy URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9nU4LBs5vwkqJWtc3X6-l5U_yyckKsdBihoTSTTpW-R4tBdgy-4DQLvHsYmlunoZV/exec';
+
+        // STATE
+        let state = {
+            tableNumber: null,
+            menuItems: [],
+            cart: [],
+            filteredItems: [],
+            currentFilter: 'Sve'
+        };
+
+        // DOM ELEMENTS
+        const scannerSection = document.getElementById('scannerSection');
+        const menuSection = document.getElementById('menuSection');
+        const qrVideo = document.getElementById('qrVideo');
+        const startCameraBtn = document.getElementById('startCameraBtn');
+        const manualInputBtn = document.getElementById('manualInputBtn');
+        const tableModal = document.getElementById('tableModal');
+        const tableInput = document.getElementById('tableInput');
+        const tableConfirmBtn = document.getElementById('tableConfirmBtn');
+        const tableCancelBtn = document.getElementById('tableCancelBtn');
+        const tableInfo = document.getElementById('tableInfo');
+        const tableNumber = document.getElementById('tableNumber');
+        const cartToggle = document.getElementById('cartToggle');
+        const cartPanel = document.getElementById('cartPanel');
+        const cartClose = document.getElementById('cartClose');
+        const filterContainer = document.getElementById('filterContainer');
+        const menuGrid = document.getElementById('menuGrid');
+        const cartItems = document.getElementById('cartItems');
+        const cartCount = document.getElementById('cartCount');
+        const cartTotalAmount = document.getElementById('cartTotalAmount');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const messageContainer = document.getElementById('messageContainer');
+        const loader = document.getElementById('loader');
+
+        // EVENT LISTENERS
+        startCameraBtn.addEventListener('click', startCamera);
+        manualInputBtn.addEventListener('click', openTableModal);
+        tableConfirmBtn.addEventListener('click', confirmTableNumber);
+        tableCancelBtn.addEventListener('click', closeTableModal);
+        cartToggle.addEventListener('click', () => cartPanel.classList.toggle('open'));
+        cartClose.addEventListener('click', () => cartPanel.classList.remove('open'));
+        checkoutBtn.addEventListener('click', handleCheckout);
+
+        tableInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') confirmTableNumber();
+        });
+
+        // Provjeri URL parametre za table broj
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tableParam = urlParams.get('table');
+            if (tableParam && !isNaN(tableParam)) {
+                setTableNumber(tableParam);
+            }
+        });
+
+        // FUNCTIONS
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' }
+                });
+                qrVideo.srcObject = stream;
+                qrVideo.style.display = 'block';
+                startCameraBtn.disabled = true;
+                scanQRCode();
+            } catch (error) {
+                showMessage('Greška pri otvaranju kamere', 'error');
+            }
+        }
+
+        function scanQRCode() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            function scan() {
+                if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA) {
+                    canvas.width = qrVideo.videoWidth;
+                    canvas.height = qrVideo.videoHeight;
+                    ctx.drawImage(qrVideo, 0, 0);
+
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                    if (code) {
+                        const qrData = code.data;
+                        if (!isNaN(qrData)) {
+                            setTableNumber(qrData);
+                            qrVideo.srcObject.getTracks().forEach(track => track.stop());
+                            return;
+                        }
+                    }
+                }
+                requestAnimationFrame(scan);
+            }
+            scan();
+        }
+
+        function openTableModal() {
+            tableModal.classList.add('active');
+            tableInput.focus();
+        }
+
+        function closeTableModal() {
+            tableModal.classList.remove('active');
+            tableInput.value = '';
+        }
+
+        function confirmTableNumber() {
+            const number = tableInput.value.trim();
+            if (number && !isNaN(number)) {
+                setTableNumber(number);
+                closeTableModal();
+            } else {
+                showMessage('Unesite validan broj stola', 'error');
+            }
+        }
+
+        function setTableNumber(number) {
+            state.tableNumber = number;
+            tableNumber.textContent = number;
+            tableInfo.style.display = 'block';
+            scannerSection.classList.remove('active');
+            menuSection.classList.add('active');
+            loadMenuItems();
+        }
+
+        async function loadMenuItems() {
+            loader.classList.add('active');
+            messageContainer.innerHTML = '';
+            
+            try {
+                console.log('Fetchujem meni sa proxy-ja:', GOOGLE_SCRIPT_URL);
+                
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?table=Table 1`);
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Podaci primljeni:', data);
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                if (!data.records || data.records.length === 0) {
+                    showMessage('❌ Tabela je prazna ili nema podataka', 'error');
+                    loader.classList.remove('active');
+                    return;
+                }
+                
+                state.menuItems = data.records.map(record => ({
+                    id: record.id,
+                    name: record.fields.Name || 'Bez imena',
+                    category: record.fields.Kategorija || 'Ostalo',
+                    description: record.fields.Opis || '',
+                    price: record.fields.Cena || 0,
+                    image: record.fields.Slika && record.fields.Slika[0] ? record.fields.Slika[0].url : null,
+                    available: record.fields.Dostupno !== false
+                }));
+
+                console.log('Obrađeni stavke:', state.menuItems);
+                setupFilters();
+                displayMenu();
+                showMessage('✅ Meni uspješno učitan iz Airtable-a!', 'success');
+                loader.classList.remove('active');
+                
+            } catch (error) {
+                console.error('Greška pri učitavanju:', error);
+                showMessage('❌ Greška pri učitavanju menija: ' + error.message, 'error');
+                loader.classList.remove('active');
+            }
+        }
+
+        function setupFilters() {
+            const categories = ['Sve', ...new Set(state.menuItems.map(item => item.category))];
+            filterContainer.innerHTML = '';
+
+            categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = `filter-btn ${category === 'Sve' ? 'active' : ''}`;
+                btn.textContent = category;
+                btn.addEventListener('click', () => filterMenu(category));
+                filterContainer.appendChild(btn);
+            });
+        }
+
+        function filterMenu(category) {
+            state.currentFilter = category;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent === category);
+            });
+
+            if (category === 'Sve') {
+                state.filteredItems = state.menuItems;
+            } else {
+                state.filteredItems = state.menuItems.filter(item => item.category === category);
+            }
+
+            displayMenu();
+        }
+
+        function displayMenu() {
+            menuGrid.innerHTML = '';
+            const itemsToDisplay = state.filteredItems.length > 0 ? state.filteredItems : state.menuItems;
+
+            itemsToDisplay.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'menu-item';
+                const imageHtml = item.image ? `<img src="${item.image}" alt="${item.name}" class="item-image">` : '';
+                div.innerHTML = `
+                    ${imageHtml}
+                    <div class="item-header">
+                        <div class="item-name">${item.name}</div>
+                        <span class="item-category">${item.category}</span>
+                    </div>
+                    <div class="item-content">
+                        <div class="item-description">${item.description}</div>
+                        <div class="item-price">${item.price} RSD</div>
+                        <div class="item-actions">
+                            <button class="btn-add" onclick="addToCart('${item.id}', '${item.name}', ${item.price})">
+                                Dodaj u korpu
+                            </button>
+                        </div>
+                    </div>
+                `;
+                menuGrid.appendChild(div);
+            });
+        }
+
+        function addToCart(itemId, itemName, price) {
+            const existingItem = state.cart.find(item => item.id === itemId);
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                state.cart.push({
+                    id: itemId,
+                    name: itemName,
+                    price: price,
+                    quantity: 1
+                });
+            }
+
+            updateCart();
+            cartPanel.classList.add('open');
+        }
+
+        function removeFromCart(itemId) {
+            state.cart = state.cart.filter(item => item.id !== itemId);
+            updateCart();
+        }
+
+        function updateQuantity(itemId, delta) {
+            const item = state.cart.find(i => i.id === itemId);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    removeFromCart(itemId);
+                } else {
+                    updateCart();
+                }
+            }
+        }
+
+        function updateCart() {
+            cartItems.innerHTML = '';
+            let total = 0;
+
+            if (state.cart.length === 0) {
+                cartItems.innerHTML = '<div class="cart-empty">Korpa je prazna</div>';
+                cartCount.style.display = 'none';
+                checkoutBtn.disabled = true;
+            } else {
+                state.cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+
+                    const div = document.createElement('div');
+                    div.className = 'cart-item';
+                    div.innerHTML = `
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">${itemTotal.toFixed(2)} RSD</div>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button class="qty-btn" onclick="updateQuantity('${item.id}', -1)">−</button>
+                            <span>${item.quantity}</span>
+                            <button class="qty-btn" onclick="updateQuantity('${item.id}', 1)">+</button>
+                        </div>
+                        <button class="cart-remove" onclick="removeFromCart('${item.id}')">Ukloni</button>
+                    `;
+                    cartItems.appendChild(div);
+                });
+
+                cartCount.textContent = state.cart.length;
+                cartCount.style.display = 'flex';
+                checkoutBtn.disabled = false;
+            }
+
+            cartTotalAmount.textContent = `${total.toFixed(2)} RSD`;
+        }
+
+        function handleCheckout() {
+            const orderSummary = state.cart.map(item => 
+                `${item.name} x${item.quantity} = ${(item.price * item.quantity).toFixed(2)} RSD`
+            ).join('\n');
+
+            const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            // Spremi narudžbinu u localStorage
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.push({
+                tableNumber: state.tableNumber,
+                items: state.cart.map(item => ({
+                    name: item.name,
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                total: total,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('orders', JSON.stringify(orders));
+
+            alert(`NARUDŽBINA - Sto broj ${state.tableNumber}\n\n${orderSummary}\n\nUkupno: ${total.toFixed(2)} RSD\n\nKonobar će potvrditi vašu narudžbinu.`);
+            
+            // Reset cart
+            state.cart = [];
+            updateCart();
+            cartPanel.classList.remove('open');
+        }
+
+        function showMessage(message, type) {
+            const className = type === 'error' ? 'error-message' : (type === 'success' ? 'success-message' : 'info-message');
+            messageContainer.innerHTML = `<div class="${className}">${message}</div>`;
+        }
+
+        // QR KOD GENERATOR - JEDNOSTAVAN
+        function openQRGenerator() {
+            const qrModal = document.getElementById('qrModal');
+            
+            // Uzmi trenutni URL iz browser-a
+            let qrUrl = window.location.href.split('?')[0];
+            
+            console.log('QR URL:', qrUrl);
+            
+            // Koristi QR kod API sa trenutnim URL-om
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrUrl)}`;
+            
+            const qrCodeDisplay = document.getElementById('qrCodeDisplay');
+            qrCodeDisplay.innerHTML = `
+                <h3 style="margin: 20px 0;">📱 Skenujte ovaj QR kod sa mobilnog telefona</h3>
+                <div class="qr-code">
+                    <img src="${qrApiUrl}" alt="QR kod za meni" style="width: 300px; height: 300px;">
+                </div>
+                <p style="font-size: 14px; color: #7f8c8d; margin-top: 20px; word-break: break-all;">URL: <strong>${qrUrl}</strong></p>
+                <p style="font-size: 13px; color: #27ae60; margin-top: 10px;">✅ Skenujte QR kod - trebalo bi da vodi na ovaj URL</p>
+            `;
+            
+            // Očisti selector buttons
+            document.getElementById('qrSelectorButtons').innerHTML = '';
+            
+            qrModal.classList.add('active');
+        }
+
+        // Nema potrebe za generateQRCode jer koristimo samo jedan QR kod
+
+        // ADMIN PANEL
+        function openAdminPanel() {
+            document.getElementById('adminModal').classList.add('active');
+            displayOrders();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function displayOrders() {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const ordersListContainer = document.getElementById('ordersListContainer');
+            
+            if (orders.length === 0) {
+                ordersListContainer.innerHTML = '<p style="text-align: center; color: #95a5a6;">Nema narudžbina</p>';
+                return;
+            }
+            
+            ordersListContainer.innerHTML = '';
+            let totalRevenue = 0;
+            
+            orders.forEach((order, index) => {
+                const orderDiv = document.createElement('div');
+                orderDiv.className = 'order-item';
+                
+                let itemsHtml = '';
+                let orderTotal = 0;
+                
+                order.items.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    orderTotal += itemTotal;
+                    itemsHtml += `${item.name} x${item.quantity} = ${itemTotal.toFixed(2)} RSD<br>`;
+                });
+                
+                totalRevenue += orderTotal;
+                const timestamp = new Date(order.timestamp).toLocaleString('sr-RS');
+                
+                orderDiv.innerHTML = `
+                    <div class="order-header">📋 Narudžbina #${index + 1} - Sto ${order.tableNumber}</div>
+                    <div class="order-details">
+                        ${itemsHtml}
+                        <div class="order-total">Ukupno: ${orderTotal.toFixed(2)} RSD</div>
+                        <div style="font-size: 12px; color: #95a5a6; margin-top: 8px;">Vrijeme: ${timestamp}</div>
+                    </div>
+                `;
+                
+                ordersListContainer.appendChild(orderDiv);
+            });
+            
+            // Dodaj sažetak
+            const summaryDiv = document.createElement('div');
+            summaryDiv.style.cssText = 'margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--border); background: var(--primary-light); padding: 15px; border-radius: 8px; text-align: center;';
+            summaryDiv.innerHTML = `
+                <strong>Ukupno Narudžbina: ${orders.length}</strong><br>
+                <strong style="font-size: 18px; color: var(--primary);">Ukupni Prihod: ${totalRevenue.toFixed(2)} RSD</strong>
+            `;
+            ordersListContainer.appendChild(summaryDiv);
+        }
+
+        function clearAllOrders() {
+            if (confirm('Da li ste sigurni da želite da obriješete sve narudžbine?')) {
+                localStorage.removeItem('orders');
+                displayOrders();
+                showMessage('✅ Sve narudžbine su obrisane', 'success');
+            }
+        }
+
+        // MAKE FUNCTIONS GLOBAL
+        window.addToCart = addToCart;
+        window.removeFromCart = removeFromCart;
+        window.updateQuantity = updateQuantity;
+        window.openQRGenerator = openQRGenerator;
+        window.openAdminPanel = openAdminPanel;
+        window.closeModal = closeModal;
+        window.clearAllOrders = clearAllOrders;
+    </script>
+</body>
+</html>
